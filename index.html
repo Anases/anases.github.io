@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonshine | Ecommerce Site Edition</title>
+    <style>
+        /* Base Styling Restructure */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* FIXED: Added Flexbox layout engine to body to support sticky footer architecture */
+        body {
+            background: radial-gradient(circle at 50% 0%, #f0f3ff 0%, #f8fafc 100%);
+            background-attachment: fixed;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Top Notification Ribbon */
+        .promo-banner {
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b00, #ec4899, #7c3aed);
+            color: #ffffff;
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+
+        /* Sticky Navigation Architecture */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .edge-navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .nav-left-group {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-grow: 1;
+            max-w: 800px;
+        }
+
+        .app-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+            flex-shrink: 0;
+        }
+
+        .logo-accent {
+            color: #ff6b00;
+        }
+
+        /* Real-Time Search Bar Wrapper */
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: rgba(241, 245, 249, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #ff6b00;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
+        }
+
+        /* Search Menu Overlay Dropdown */
+        .search-dropdown {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            margin-top: 12px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e293b;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 24px;
+            z-index: 9999;
+        }
+
+        .search-dropdown.active {
+            display: grid;
+        }
+
+        .dropdown-column h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #f97316;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .tag-btn:hover {
+            background: #ff6b00;
+            color: #ffffff;
+        }
+
+        .dropdown-links {
+            list-style: none;
+        }
+
+        .dropdown-links li {
+            margin-bottom: 8px;
+        }
+
+        .dropdown-links button {
+            color: #cbd5e1;
+            font-size: 13px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .dropdown-links button:hover {
+            color: #f97316;
+        }
+
+        /* Cart Trigger Icon Node */
+        .cart-trigger {
+            position: relative;
+            padding: 10px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-size: 18px;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cart-trigger:hover {
+            background: #e2e8f0;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: linear-gradient(135deg, #ff6b00, #ec4899);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Categories Ribbon */
+        .studio-panel-container {
+            max-width: 1280px;
+            margin: 12px auto 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .studio-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .studio-panel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .category-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .category-btn.active-all {
+            color: #ff6b00;
+            font-weight: 600;
+        }
+
+        /* FIXED: Main Workspace Container automatically expands to push footer downward */
+        main {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+            flex-grow: 1;
+        }
+
+        /* Hero Promotion Canvas */
+        .promo-hero {
+            border-radius: 24px;
+            padding: 32px;
+            min-height: 200px;
+            background: linear-gradient(135deg, #1e1b4b, #581c87, #9d174d);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-tag {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.2);
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 4px 10px;
+            border-radius: 50px;
+            margin-bottom: 12px;
+        }
+
+        .promo-hero h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .promo-hero h2 span {
+            color: #fb923c;
+        }
+
+        .promo-hero p {
+            font-size: 14px;
+            color: #e0e7ff;
+        }
+
+        /* Section Splitter Row */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            color: #1e293b;
+        }
+
+        .reset-link {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff6b00;
+            cursor: pointer;
+        }
+
+        /* Product Gallery Grid Layout */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 64px 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Interactive Studio Product Cards */
+        .studio-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .studio-card:hover {
+            transform: translateY(-4px);
+            border-color: #ff6b00;
+            box-shadow: 0 20px 25px -5px rgba(255, 107, 0, 0.1);
+        }
+
+        .card-img-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8fafc;
+            margin-bottom: 14px;
+        }
+
+        .card-img-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(90deg, #ff6b00, #ec4899);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 6px;
+            z-index: 10;
+        }
+
+        /* Slider Controls Overlay */
+        .slider-arrows {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+        }
+
+        .studio-card:hover .slider-arrows {
+            opacity: 1;
+        }
+
+        .arrow-btn {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .arrow-btn:hover {
+            background: #ff6b00;
+            color: white;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: all 0.15s ease;
+        }
+
+        .dot.active {
+            background: #ff6b00;
+            width: 12px;
+        }
+
+        /* Card Content Metrics */
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 40px;
+        }
+
+        .card-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .price-current {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ff6b00;
+        }
+
+        .price-original {
+            font-size: 12px;
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .star-rating {
+            color: #fbbf24;
+            font-size: 12px;
+        }
+
+        .add-bag-btn {
+            width: 100%;
+            background: #0f172a;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px 0;
+            border-radius: 12px;
+            margin-top: 16px;
+            letter-spacing: 0.02em;
+        }
+
+        .add-bag-btn:hover {
+            background: #ff6b00;
+        }
+
+        /* Sliding Cart Sidebar Framework */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            max-width: 384px;
+            background: #ffffff;
+            border-left: 1px solid #e2e8f0;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+            border-radius: 24px 0 0 24px;
+        }
+
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .cart-header {
+            padding: 24px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .close-cart-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            padding: 48px 0;
+        }
+
+        /* Mini Cart Row Configurations */
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        .cart-item-img-wrap {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .cart-item-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item-img-wrap:hover .slider-arrows {
+            opacity: 1;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .cart-item-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cart-item-price {
+            font-size: 12px;
+            color: #ff6b00;
+            font-weight: 600;
+            margin: 2px 0 6px 0;
+        }
+
+        /* Row Quantity Controllers State */
+        .quantity-controller {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            background: rgba(226, 232, 240, 0.8);
+            color: #1e293b;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .qty-display {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            width: 16px;
+            text-align: center;
+        }
+
+        .delete-item-btn {
+            color: #cbd5e1;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .delete-item-btn:hover {
+            color: #ef4444;
+        }
+
+        /* Cart Aggregation Base Frame */
+        .cart-footer {
+            padding: 24px;
+            border-top: 1px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 0 0 0 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .summary-row span:last-child {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .summary-row.total-row {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row.total-row span:last-child {
+            color: #ff6b00;
+            font-size: 18px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b00, #ec4899);
+            color: white;
+            padding: 14px 0;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 10px 15px -3px rgba(255, 107, 0, 0.2);
+        }
+
+        /* Base Footer Component Array */
+        footer {
+            margin-top: 80px;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 40px 24px;
+            flex-shrink: 0;
+        }
+
+        .footer-grid {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff6b00;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .footer-col.dark h4 {
+            color: #0f172a;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: #64748b;
+            font-size: 13px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ff6b00;
+        }
+
+        .footer-col p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 40px auto 0 auto;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+        }
+
+        .footer-links a:hover {
+            color: #64748b;
+        }
+
+        /* Responsive Breakpoints & Header Preservation Layouts */
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-col:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .edge-navbar {
+                padding: 10px 14px;
+                gap: 12px;
+            }
+            .nav-left-group {
+                gap: 12px;
+            }
+            .app-logo {
+                font-size: 20px;
+            }
+            .search-input {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+            .search-dropdown {
+                width: calc(100vw - 28px);
+                left: -60px;
+                padding: 16px;
+                gap: 16px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .footer-col:last-child {
+                grid-column: span 1;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body onclick="closeSearchDropdown(event)">
+
+    <div class="promo-banner">
+        🚀 CREATOR DROPS: UP TO 40% OFF APPLE STUDIO ECOSYSTEM ACCENTS!
+    </div>
+
+    <header>
+        <div class="edge-navbar">
+            <div class="nav-left-group">
+                <a href="#" onclick="resetSearch(event)" class="app-logo">
+                    <span class="logo-accent">Moonshine</span>Mart
+                </a>
+                
+                <div class="search-wrapper" onclick="event.stopPropagation()">
+                    <input type="text" id="main-search" oninput="handleSearch(this.value)" onfocus="openSearchDropdown()" placeholder="Search instantly..." class="search-input">
+
+                    <div id="search-dropdown" class="search-dropdown">
+                        <div class="dropdown-column">
+                            <h4>Hot Tags</h4>
+                            <div class="tag-cloud">
+                                <button onclick="handleMenuSelection('Ultra-Strap')" class="tag-btn">#Strap</button>
+                                <button onclick="handleMenuSelection('AirPods')" class="tag-btn">#AirPods</button>
+                                <button onclick="handleMenuSelection('Keyboard')" class="tag-btn">#Keyboard</button>
+                                <button onclick="handleMenuSelection('Case')" class="tag-btn">#Cases</button>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-column">
+                            <h4>Ecosystem Matrix</h4>
+                            <ul class="dropdown-links">
+                                <li><button onclick="handleMenuSelection('Apple')"> Apple Originals</button></li>
+                                <li><button onclick="handleMenuSelection('Anker')">⚡ Anker Soundlabs</button></li>
+                                <li><button onclick="handleMenuSelection('Daraz')">✨ vDaraz Premium Lab</button></li>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown-column">
+                            <h4>Price Brackets</h4>
+                            <ul class="dropdown-links">
+                                <li><button onclick="filterByPrice(0, 5000)">Below Rs. 5,000</button></li>
+                                <li><button onclick="filterByPrice(5000, 15000)">Rs. 5,000 - 15,000</button></li>
+                                <li><button onclick="filterByPrice(15000, 50000)">Above Rs. 15,000</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <button onclick="toggleCart()" class="cart-trigger" aria-label="Open Cart Bag">
+                    🛍️
+                    <span id="cart-count" class="cart-badge">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="studio-panel-container">
+            <div class="studio-panel">
+                <button onclick="resetSearch(event)" class="category-btn active-all">All Collection</button>
+                <span style="color: #cbd5e1;">|</span>
+                <button onclick="filterByCategory('VisionOS')" class="category-btn">✨ Spatial Accents</button>
+                <button onclick="filterByCategory('Audio')" class="category-btn">🎧 Audio Wear</button>
+                <button onclick="filterByCategory('Gaming')" class="category-btn">🎮 Pro Rig Deck</button>
+                <button onclick="filterByCategory('Desk')" class="category-btn">💼 Workspace Lab</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="promo-hero">
+            <span class="hero-tag">Creator Tier Verified</span>
+            <h2>Elevate your desktop <span>visual posture.</span></h2>
+            <p>Clean architecture layouts built over minimal functional nodes.</p>
+        </div>
+
+        <div class="section-header">
+            <h3 id="grid-title">Live Ecosystem Marketplace</h3>
+            <span onclick="resetSearch(event)" class="reset-link">Reset Filters &times;</span>
+        </div>
+
+        <div id="product-grid" class="product-grid">
+            </div>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#">Help Desk Matrix</a></li>
+                    <li><a href="#">Secure Procurement</a></li>
+                    <li><a href="#">Returns Blueprint</a></li>
+                </ul>
+            </div>
+            <div class="footer-col dark">
+                <h4>vDaraz Engine</h4>
+                <ul>
+                    <li><a href="#">Corporate Infrastructure</a></li>
+                    <li><a href="#">Digital Invoicing Gateway</a></li>
+                    <li><a href="#">Philanthropy Nodes</a></li>
+                </ul>
+            </div>
+            <div class="footer-col dark">
+                <h4>Fulfillment Logic</h4>
+                <p>Sandbox simulations are evaluated securely on client browsers. Product components use modern styling variables via native CSS layout properties.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Arcade House Frameworks. Architectural blueprint sandbox iteration.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Directives</a>
+                <a href="#">User Manifest</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Studio Bag</h3>
+            <button onclick="toggleCart()" class="close-cart-btn" aria-label="Close Shopping Bag">&times;</button>
+        </div>
+        
+        <div class="cart-body">
+            <p class="empty-cart-msg" id="empty-cart-msg">Your shopping bag is completely clear.</p>
+            <div id="cart-items" class="cart-items-container"></div>
+        </div>
+        
+        <div class="cart-footer">
+            <div class="summary-row"><span>Ecosystem Subtotal</span><span id="cart-subtotal">Rs. 0</span></div>
+            <div class="summary-row"><span>Logistical Rate</span><span id="cart-shipping">Rs. 0</span></div>
+            <div class="summary-row total-row"><span>Aggregate Gross</span><span id="cart-total">Rs. 0</span></div>
+            <button onclick="alert('Checkout Complete! Thank you for simulating vDaraz Studio.')" class="checkout-btn">
+                Finalize Core Purchase
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { 
+                id: 1, 
+                title: "Apple Vision Pro Ultra-Strap", 
+                category: "VisionOS", 
+                price: 28500, 
+                originalPrice: 45000, 
+                rating: "4.9", 
+                reviews: 142, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1608248597481-496100c8c836?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400"
+                ]
+            },
+            { 
+                id: 2, 
+                title: "Anker Spatial Audio AirPods Pro 3", 
+                category: "Audio", 
+                price: 19999, 
+                originalPrice: 25000, 
+                rating: "4.8", 
+                reviews: 88, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&q=80&w=400"
+                ]
+            },
+            { 
+                id: 3, 
+                title: "Daraz Prime Matte Cyberpunk Keyboard", 
+                category: "Gaming", 
+                price: 8400, 
+                originalPrice: 12000, 
+                rating: "4.7", 
+                reviews: 310, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&q=80&w=400"
+                ]
+            },
+            { 
+                id: 4, 
+                title: "VisionOS Transparent Desk Mat (XL)", 
+                category: "Desk", 
+                price: 3200, 
+                originalPrice: 6000, 
+                rating: "4.5", 
+                reviews: 45, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=400"
+                ]
+            },
+            { 
+                id: 5, 
+                title: "MagSafe Minimalist Dock Stand", 
+                category: "Desk", 
+                price: 4900, 
+                originalPrice: 7500, 
+                rating: "4.6", 
+                reviews: 19, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=400"
+                ]
+            },
+            { 
+                id: 6, 
+                title: "Carbon Fiber Spatial Trackpad Case", 
+                category: "VisionOS", 
+                price: 6100, 
+                originalPrice: 9000, 
+                rating: "4.9", 
+                reviews: 64, 
+                activeImgIdx: 0,
+                imgs: [
+                    "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=400",
+                    "https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&q=80&w=400"
+                ]
+            }
+        ];
+
+        let cart = [];
+        let filteredProducts = [...products];
+
+        function displayProducts() {
+            const container = document.getElementById('product-grid');
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `<div class="no-results">No products found matching your active filter scopes.</div>`;
+                return;
+            }
+            container.innerHTML = filteredProducts.map(prod => {
+                const discount = Math.round(((prod.originalPrice - prod.price) / prod.originalPrice) * 100);
+                return `
+                    <div class="studio-card">
+                        <div>
+                            <div class="card-img-frame">
+                                <img src="${prod.imgs[prod.activeImgIdx]}" alt="${prod.title}">
+                                <span class="discount-badge">-${discount}%</span>
+                                
+                                <div class="slider-arrows">
+                                    <button onclick="event.stopPropagation(); shiftCardImg(${prod.id}, 'prev')" class="arrow-btn" aria-label="Previous image">&lsaquo;</button>
+                                    <button onclick="event.stopPropagation(); shiftCardImg(${prod.id}, 'next')" class="arrow-btn" aria-label="Next image">&rsaquo;</button>
+                                </div>
+                                
+                                <div class="slider-dots">
+                                    ${prod.imgs.map((_, idx) => `
+                                        <span class="dot ${idx === prod.activeImgIdx ? 'active' : ''}"></span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <h4 class="card-title">${prod.title}</h4>
+                            <div class="card-prices">
+                                <span class="price-current">Rs. ${prod.price.toLocaleString()}</span>
+                                <span class="price-original">Rs. ${prod.originalPrice.toLocaleString()}</span>
+                            </div>
+                            <div class="card-meta">
+                                <span class="star-rating">★</span><strong>${prod.rating}</strong><span>(${prod.reviews})</span>
+                            </div>
+                        </div>
+                        <button onclick="addToCart(${prod.id})" class="add-bag-btn">Add to Bag</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function shiftCardImg(productId, direction) {
+            const prod = products.find(p => p.id === productId);
+            const filteredProd = filteredProducts.find(p => p.id === productId);
+            if (!prod) return;
+
+            if (direction === 'next') {
+                prod.activeImgIdx = (prod.activeImgIdx + 1) % prod.imgs.length;
+            } else {
+                prod.activeImgIdx = (prod.activeImgIdx - 1 + prod.imgs.length) % prod.imgs.length;
+            }
+            if (filteredProd) filteredProd.activeImgIdx = prod.activeImgIdx;
+            
+            displayProducts();
+        }
+
+        function openSearchDropdown() {
+            document.getElementById('search-dropdown').classList.add('active');
+        }
+
+        function closeSearchDropdown(event) {
+            document.getElementById('search-dropdown').classList.remove('active');
+        }
+
+        function handleSearch(query) {
+            filteredProducts = products.filter(p => p.title.toLowerCase().includes(query.toLowerCase()));
+            document.getElementById('grid-title').innerText = query ? `Search Isolation: "${query}"` : "Live Ecosystem Marketplace";
+            displayProducts();
+        }
+
+        function handleMenuSelection(queryKeyword) {
+            document.getElementById('main-search').value = queryKeyword;
+            handleSearch(queryKeyword);
+            document.getElementById('search-dropdown').classList.remove('active');
+        }
+
+        function filterByCategory(categoryKey) {
+            filteredProducts = products.filter(p => p.category === categoryKey);
+            document.getElementById('grid-title').innerText = `Category Stack: ${categoryKey}`;
+            displayProducts();
+        }
+
+        function filterByPrice(min, max) {
+            filteredProducts = products.filter(p => p.price >= min && p.price <= max);
+            document.getElementById('grid-title').innerText = `Price Slice: Rs. ${min.toLocaleString()} - Rs. ${max.toLocaleString()}`;
+            displayProducts();
+            document.getElementById('search-dropdown').classList.remove('active');
+        }
+
+        function resetSearch(e) {
+            if(e) e.preventDefault();
+            document.getElementById('main-search').value = '';
+            filteredProducts = [...products];
+            document.getElementById('grid-title').innerText = "Live Ecosystem Marketplace";
+            displayProducts();
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+        }
+
+        function addToCart(productId) {
+            const matchedProduct = products.find(p => p.id === productId);
+            const activeCartItem = cart.find(item => item.id === productId);
+            if (activeCartItem) { 
+                activeCartItem.quantity++; 
+            } else { 
+                cart.push({ ...matchedProduct, quantity: 1, activeImgIdx: matchedProduct.activeImgIdx }); 
+            }
+            updateCartUI();
+        }
+
+        function changeQuantity(productId, amount) {
+            const activeCartItem = cart.find(item => item.id === productId);
+            if (!activeCartItem) return;
+
+            activeCartItem.quantity += amount;
+            
+            if (activeCartItem.quantity <= 0) {
+                removeCartItem(productId);
+            } else {
+                updateCartUI();
+            }
+        }
+
+        function removeCartItem(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function shiftCartImg(cartItemId, direction) {
+            const item = cart.find(i => i.id === cartItemId);
+            if (!item) return;
+            
+            if (direction === 'next') {
+                item.activeImgIdx = (item.activeImgIdx + 1) % item.imgs.length;
+            } else {
+                item.activeImgIdx = (item.activeImgIdx - 1 + item.imgs.length) % item.imgs.length;
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const countBadge = document.getElementById('cart-count');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            let subtotal = 0, totalItemsCount = 0;
+
+            if (cart.length === 0) {
+                emptyMsg.style.display = 'block';
+                cartItemsContainer.innerHTML = '';
+            } else {
+                emptyMsg.style.display = 'none';
+                cartItemsContainer.innerHTML = cart.map(item => {
+                    subtotal += item.price * item.quantity;
+                    totalItemsCount += item.quantity;
+                    return `
+                        <div class="cart-item-row">
+                            <div class="cart-item-img-wrap">
+                                <img src="${item.imgs[item.activeImgIdx]}" alt="${item.title}">
+                                
+                                <div class="slider-arrows">
+                                    <button onclick="event.stopPropagation(); shiftCartImg(${item.id}, 'prev')" class="arrow-btn" style="width:16px; height:16px; font-size:10px;">&lsaquo;</button>
+                                    <button onclick="event.stopPropagation(); shiftCartImg(${item.id}, 'next')" class="arrow-btn" style="width:16px; height:16px; font-size:10px;">&rsaquo;</button>
+                                </div>
+                                
+                                <div class="slider-dots">
+                                    ${item.imgs.map((_, idx) => `
+                                        <span class="dot ${idx === item.activeImgIdx ? 'active' : ''}" style="width:3px; height:3px;"></span>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="cart-item-info">
+                                <h5 class="cart-item-title">${item.title}</h5>
+                                <p class="cart-item-price">Rs. ${(item.price * item.quantity).toLocaleString()}</p>
+                                
+                                <div class="quantity-controller">
+                                    <button onclick="changeQuantity(${item.id}, -1)" class="qty-btn">-</button>
+                                    <span class="qty-display">${item.quantity}</span>
+                                    <button onclick="changeQuantity(${item.id}, 1)" class="qty-btn">+</button>
+                                </div>
+                            </div>
+
+                            <button onclick="removeCartItem(${item.id})" class="delete-item-btn" title="Remove item completely">&times;</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+            let shipping = subtotal > 0 ? 250 : 0;
+            countBadge.innerText = totalItemsCount;
+            document.getElementById('cart-subtotal').innerText = `Rs. ${subtotal.toLocaleString()}`;
+            document.getElementById('cart-shipping').innerText = `Rs. ${shipping.toLocaleString()}`;
+            document.getElementById('cart-total').innerText = `Rs. ${(subtotal + shipping).toLocaleString()}`;
+        }
+
+        window.onload = () => { displayProducts(); };
+    </script>
+</body>
+</html>
