@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Software Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Smooth transitions for manual slider layout structures */
+        .slider-wrapper { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                <div class="bg-blue-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-layer-group text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight leading-none">Arcade Store</h1>
+                    <span class="text-[11px] text-slate-400">Enterprise Repository</span>
+                </div>
+            </div>
+            
+            <div class="relative w-full md:w-96" id="searchContainer">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search & download instantly from here..." 
+                        class="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-800 text-slate-100 placeholder-slate-400 border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition text-sm"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div id="searchDropdown" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 max-h-80 overflow-y-auto text-gray-800 z-50">
+                    <div class="p-2 border-b border-gray-100 bg-gray-50 text-[10px] font-bold text-gray-400 tracking-wider px-4">
+                        QUICK DOWNLOAD MATCHES
+                    </div>
+                    <div id="dropdownResults" class="divide-y divide-gray-100">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-6 flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
+        
+        <aside class="hidden md:block md:col-span-1 space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Categories</h3>
+                <div class="flex flex-col gap-1" id="categoryFilters">
+                    <button class="filter-btn active w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-600 flex justify-between items-center cursor-pointer" data-category="all">
+                        <span>All Software</span>
+                        <span id="count-all" class="text-xs bg-blue-100 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="Development">
+                        <span>Development</span>
+                        <span id="count-Development" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="Design">
+                        <span>Design</span>
+                        <span id="count-Design" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button>
+                    <!--button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="Database">
+                        <span>Database</span>
+                        <span id="count-Database" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button-->
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="Productivity">
+                        <span>Productivity</span>
+                        <span id="count-Productivity" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="Security">
+                        <span>Security</span>
+                        <span id="count-Security" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button>
+                    <!--button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 flex justify-between items-center cursor-pointer" data-category="eBooks">
+                        <span>eBooks</span>
+                        <span id="count-eBooks" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">0</span>
+                    </button-->
+                </div>
+            </div>
+
+            <div class="relative overflow-hidden w-full h-44 rounded-xl shadow-sm border border-gray-200 bg-white">
+                <div class="flex w-[300%] h-full slider-wrapper" id="sliderWrapper">
+                    <div class="w-1/3 h-full p-5 flex flex-col justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative">
+                        <span class="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase w-max mb-1.5">PROMOTED</span>
+                        <h4 class="font-bold text-sm text-slate-900 leading-tight">Arcade Store Premium Plus</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-normal">Unlock unlimited fast-lane download pipelines and secure automated workspace sync mirrors.</p>
+                    </div>
+                    <div class="w-1/3 h-full p-5 flex flex-col justify-center bg-gradient-to-br from-cyan-50 to-emerald-100 relative">
+                        <span class="bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase w-max mb-1.5">SECURITY</span>
+                        <h4 class="font-bold text-sm text-slate-900 leading-tight">Verified Binary Grids</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-normal">Every single application target passes active sandboxed threat analysis and hash evaluation routines.</p>
+                    </div>
+                    <div class="w-1/3 h-full p-5 flex flex-col justify-center bg-gradient-to-br from-purple-50 to-pink-100 relative">
+                        <span class="bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase w-max mb-1.5">UPDATED</span>
+                        <h4 class="font-bold text-sm text-slate-900 leading-tight">2026 Distribution Node</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-normal">Connected caching frameworks configured globally for optimized regional microservice download speed loads.</p>
+                    </div>
+                </div>
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10" id="sliderDots">
+                    <div class="w-1.5 h-1.5 rounded-full bg-slate-300 cursor-pointer transition-all duration-300 active-dot bg-blue-600 !w-4" onclick="goToSlide(0)"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-slate-300 cursor-pointer transition-all duration-300" onclick="goToSlide(1)"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-slate-300 cursor-pointer transition-all duration-300" onclick="goToSlide(2)"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="md:col-span-3">
+            <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            </div>
+
+            <div id="noResults" class="hidden text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+                <i class="fa-solid fa-magnifying-glass-blur text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500 font-medium">No applications found matching your criteria.</p>
+                <button onclick="resetFilters()" class="mt-2 text-sm text-blue-600 font-semibold hover:underline cursor-pointer">Clear all filtering parameters</button>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-400 mt-auto">
+        <p>&copy; 2026 Arcade Software Solutions</p>
+    </footer>
+
+    <script>
+        const softwareData = [
+            { id: 1, name: "Visual Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Navicat Premium is a robust, all-in-one solution for database development that enables seamless connections to multiple databases.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 8, name: "SQL Server 2025", category: "Development", version: "v17", size: "4.87 MB", icon: "fa-code", color: "bg-amber-500", desc: "EE: B64XM-XC68Y-XRM4N-MTX7B-MY9J4 <br> SE: HX782-X7RHN-BVHGT-8HB24-2KGXG", requirement: "Windows", downloadUrl: "https://download.microsoft.com/download/35b49aff-d8bb-43ba-8b3b-4ae1ae6963f3/SQL2025-SSEI-Eval.exe" },
+            { id: 9, name: "Visual Studio 2026", category: "Development", version: "v18", size: "5.4 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Pro: NVTDK-QB8J9-M28GR-92BPC-BTHXK <br> Ent: VYGRN-WPR22-HG4X3-692BF-QGT2V", requirement: "Windows", downloadUrl: "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=enterprise&channel=stable&version=VS18&source=VSLandingPage&cid=2500:43733d98d4be4cefbf73d13d430a8a48" },
+            { id: 10, name: "Adobe Acrobat Reader", category: "Productivity", version: "v26", size: "793 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "The world’s most trusted free PDF viewer.", requirement: "Windows", downloadUrl: "https://ardownload3.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2600121662/AcroRdrDCx642600121662_MUI.exe" },
+            { id: 11, name: "VLC media player", category: "Productivity", version: "v3.0", size: "43.8 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "VLC a free and open source cross-platform multimedia player and framework that plays most  multimedia files.", requirement: "Windows", downloadUrl: "https://mirror.bom2.albony.in/videolan-ftp/vlc/3.0.23/win64/vlc-3.0.23-win64.exe" },
+            { id: 12, name: "Eclipse IDE", category: "Development", version: "v26.6", size: "556 MB", icon: "fa-database", color: "bg-blue-500", desc: "Eclipse IDE for Eclipse Committers.", requirement: "Windows", downloadUrl: "https://ftp.jaist.ac.jp/pub/eclipse/technology/epp/downloads/release/2026-06/R/eclipse-committers-2026-06-R-win32-x86_64.zip" },
+            { id: 13, name: "Java SE Development Kit (LTS)", category: "Development", version: "v25.0.3", size: "183.28 MB", icon: "fa-palette", color: "bg-purple-500", desc: "JDK 25 binaries are free to use in production and free to redistribute, at no cost, under the (NFTC).", requirement: "Windows", downloadUrl: "https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.msi" },
+            { id: 14, name: "Google Antigravity", category: "Development", version: "v2.0", size: "129 MB", icon: "fa-database", color: "bg-blue-500", desc: "Google Antigravity is our agentic development platform, allowing anyone to build in the agent-first era.", requirement: "Windows", downloadUrl: "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.2.1-5287492581195776/windows-x64/Antigravity-x64.exe" },
+            { id: 15, name: "Adobe Photoshop", category: "Design", version: "v7.0", size: "243.7 MB", icon: "fa-palette", color: "bg-amber-500", desc: "Serial Number: <br> 1045-1209-6738-4668-7696-2783", requirement: "Windows", downloadUrl: "https://dn721502.ca.archive.org/0/items/adobe-photoshop-7.0_202411/Adobe%20Photoshop%207.0.iso" },
+            { id: 16, name: "PowerISO", category: "Productivity", version: "v9.2", size: "5.3 MB (Do not update version)", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "User Name: Hardik <br> Reg code:TZXZT-USMCB-ZRKYP-MTVG3-JM8UL", requirement: "Windows", downloadUrl: "https://gsf-fl.softonic.com/791/d68/74fe28e15731ccaade20a98a40aae6a70d/9.2.0.0.exe?Expires=1782629994&Signature=144c2a2081909c1098e0631fdcdf288a0ccca39e&url=https://poweriso-power-iso.en.softonic.com/&Filename=9.2.0.0.exe" },
+            { id: 17, name: "MS Office 2007 Enterprise", category: "Productivity", version: "v12.0", size: "558.7 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Serial Key: <br> BQDQB-KRRY9-43DBR-4P9J4-DH7D8", requirement: "Windows", downloadUrl: "https://dn721902.ca.archive.org/0/items/ms-office-2007/MS%20Office%202007.iso" },
+            { id: 18, name: "Google Chrome", category: "Development", version: "v149.0", size: "147 MB (Enterprise)", icon: "fa-database", color: "bg-blue-500", desc: "Download the most trusted enterprise browser.", requirement: "Windows", downloadUrl: "https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7BE3641086-B477-4213-AF46-0E3D041F67E5%7D%26browser%3D5%26usagestats%3D0%26appname%3DGoogle%2520Chrome%26needsadmin%3Dtrue%26ap%3Dx64-stable-statsdef_0%26brand%3DGCEA/dl/chrome/install/googlechromestandaloneenterprise64.msi" },
+            { id: 19, name: "WinRAR", category: "Productivity", version: "v7.22", size: "3.6 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Compress, Encrypt, Package and Backup with only one utility.", requirement: "Windows", downloadUrl: "https://www.win-rar.com/fileadmin/winrar-versions/winrar/winrar-x64-722.exe" },
+            { id: 20, name: "WinRAR Registry Key", category: "Productivity", version: "v7.22", size: "876 Bytes", icon: "fa-palette", color: "bg-purple-500", desc: "Extract folder and paste rarreg.key file in C:/ProgramFiles/WinRAR/.", requirement: "Windows", downloadUrl: "https://codeload.github.com/gist/de84d1ca59952cf1efaa8c061aab81a1/zip/ca31cbda01412e85949810d52d03573af281f826" },
+            { id: 21, name: "Firefox ESR", category: "Development", version: "v140.12", size: "69.9 MB", icon: "fa-database", color: "bg-blue-500", desc: "Browser: Firefox Extended Support Release.", requirement: "Windows", downloadUrl: "https://download-installer.cdn.mozilla.net/pub/firefox/releases/140.12.0esr/win64/en-US/Firefox%20Setup%20140.12.0esr.msi" },
+            { id: 22, name: "MS Office 2024 Professional", category: "Productivity", version: "v16.0", size: "5.1 GB (Retail)", icon: "fa-code", color: "bg-amber-500", desc: "Microsoft Corporation - Classic 2024 desktop versions of Word, Excel, PowerPoint, and OneNote.", requirement: "Windows", downloadUrl: "https://officecdn.microsoft.com/db/492350f6-3a01-4f97-b9c0-c7c6ddf67d60/media/en-us/ProPlus2024Retail.img" },
+            { id: 23, name: "Microsoft Activation Scripts", category: "Productivity", version: "v5.1", size: "3 MB (Supports Windows & Office)", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Open PowerShell and paste script below: <br> irm https://get.activated.win | iex", requirement: "Windows", downloadUrl: "https://deepwiki.com/massgravel/massgrave.dev/2-microsoft-activation-scripts-(mas)" },
+            /*{ id: 24, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 25, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 26, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 27, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 28, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 29, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 30, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 31, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 32, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 33, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 34, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 35, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 36, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 37, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 38, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 39, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 40, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 41, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 42, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 43, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 44, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 45, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 46, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 47, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 48, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 49, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 50, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 51, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 52, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 53, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 54, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 55, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 56, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 57, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 58, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 59, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 60, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 61, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 62, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 63, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 64, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 65, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 66, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 67, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 68, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 69, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 70, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 71, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 72, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 73, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 74, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 75, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 76, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 77, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 78, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 79, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 80, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 81, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 82, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 83, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 84, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 85, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 86, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 87, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 88, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 89, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 90, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 91, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 92, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 93, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 94, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 95, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 96, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 97, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 98, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 99, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 100, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 101, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 102, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 103, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 104, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 105, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 106, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 107, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 108, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 109, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 110, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 111, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 112, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 113, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 114, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 115, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 116, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 117, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 118, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 119, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 120, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" },
+            { id: 1, name: "Visula Studio Code", category: "Development", version: "v1.126", size: "192 MB", icon: "fa-code", color: "bg-amber-500", desc: "Advanced integrated code editor optimized for cloud-native compilation and structural web workflows.", requirement: "Windows", downloadUrl: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user" },
+            { id: 2, name: "Blender Engine", category: "Design", version: "v5.1", size: "354 MB", icon: "fa-bezier-curve", color: "bg-pink-500", desc: "Professional open source 3D graphics creation suite with collaborative real-time viewport tools.", requirement: "Windows", downloadUrl: "https://download.blender.org/release/Blender5.1/blender-5.1.2-windows-x64.msi" },
+            { id: 3, name: "Obsidian Node", category: "Productivity", version: "v1.12", size: "282 MB", icon: "fa-list-check", color: "bg-emerald-500", desc: "Local-first markdown knowledge base and notebook engine running fully offline tool configurations.", requirement: "Windows, macOS, Linux", downloadUrl: "https://obsidian.md/download" },
+            { id: 4, name: "OpenVPN Sync", category: "Security", version: "v3.8", size: "32 MB", icon: "fa-shield-halved", color: "bg-indigo-500", desc: "Trusted local encryption utility safeguarding remote connection lanes and configuration setups.", requirement: "Windows, macOS", downloadUrl: "https://openvpn.net/client/" },
+            { id: 5, name: "DBeaver Client", category: "Development", version: "v26.1", size: "111 MB", icon: "fa-database", color: "bg-blue-500", desc: "Universal multi-platform database client explorer supporting relational parsing maps directly.", requirement: "Windows, macOS, Linux", downloadUrl: "https://dbeaver.io/download/" },
+            { id: 6, name: "GIMP Workspace", category: "Design", version: "v3.2.4", size: "179 MB", icon: "fa-palette", color: "bg-purple-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows, macOS, Linux", downloadUrl: "https://www.gimp.org/downloads/" },
+            { id: 7, name: "Navicat Premium Lite", category: "Development", version: "v17", size: "116 MB", icon: "fa-database", color: "bg-blue-500", desc: "Cross-platform image manipulation framework built for high-tier photo compositions and assets structural design.", requirement: "Windows", downloadUrl: "https://dn.navicat.com/download/navicat17_premium_lite_en_x64.exe" }
+        */];
+
+        let currentSearch = "";
+        let currentCategory = "all";
+
+        const searchInput = document.getElementById('searchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+        const dropdownResults = document.getElementById('dropdownResults');
+        const catalogGrid = document.getElementById('catalogGrid');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const noResults = document.getElementById('noResults');
+
+        /* Dynamic Image Slideshow loop calculations */
+        let currentSlideIndex = 0;
+        const totalSlides = 3;
+        const sliderWrapper = document.getElementById('sliderWrapper');
+        const dots = document.querySelectorAll('#sliderDots > div');
+
+        function goToSlide(index) {
+            currentSlideIndex = index;
+            sliderWrapper.style.transform = `translateX(-${index * 33.3333}%)`;
+            dots.forEach((dot, idx) => {
+                if(idx === index) {
+                    dot.classList.add('bg-blue-600', '!w-4');
+                    dot.classList.remove('bg-slate-300');
+                } else {
+                    dot.classList.remove('bg-blue-600', '!w-4');
+                    dot.classList.add('bg-slate-300');
+                }
+            });
+        }
+
+        setInterval(() => {
+            currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+            goToSlide(currentSlideIndex);
+        }, 4000);
+
+        function getPlatformBadges(requirementText) {
+            const lower = requirementText.toLowerCase();
+            let badges = [];
+            
+            if (lower.includes('windows')) {
+                badges.push('<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-brands fa-windows mr-1"></i>Windows</span>');
+            }
+            if (lower.includes('mac')) {
+                badges.push('<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-brands fa-apple mr-1"></i>macOS</span>');
+            }
+            if (lower.includes('linux')) {
+                badges.push('<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-brands fa-linux mr-1"></i>Linux</span>');
+            }
+            
+            return `<div class="flex flex-wrap gap-1">${badges.join('')}</div>`;
+        }
+
+        function updateCategoryBadges() {
+            document.getElementById('count-all').innerText = softwareData.length;
+            ['Development', 'Design', 'Productivity', 'Security'].forEach(cat => {
+                const count = softwareData.filter(app => app.category === cat).length;
+                const badge = document.getElementById(`count-${cat}`);
+                if (badge) badge.innerText = count;
+            });
+        }
+
+        function renderMainCatalog() {
+            const matches = softwareData.filter(app => {
+                const textMatch = app.name.toLowerCase().includes(currentSearch.toLowerCase()) || app.desc.toLowerCase().includes(currentSearch.toLowerCase());
+                const categoryMatch = currentCategory === "all" || app.category === currentCategory;
+                return textMatch && categoryMatch;
+            });
+
+            if (matches.length === 0) {
+                catalogGrid.innerHTML = "";
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+
+            catalogGrid.innerHTML = matches.map(app => `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                    <div class="p-5 flex-1">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="${app.color} text-white p-2.5 rounded-lg text-sm w-10 h-10 flex items-center justify-center shadow-sm">
+                                <i class="fa-solid ${app.icon}"></i>
+                            </div>
+                            <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">${app.category}</span>
+                        </div>
+                        <h4 class="font-bold text-base text-gray-900 grid-hover:text-blue-600 transition-colors">${app.name}</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">${app.version} • ${app.size}</p>
+                        <p class="text-xs text-gray-500 mt-2.5 line-clamp-2 leading-relaxed">${app.desc}</p>
+                    </div>
+                    
+                    <div class="px-5 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3">
+                        ${getPlatformBadges(app.requirement)}
+                        <a 
+                            href="${app.downloadUrl}" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="bg-white hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                            <i class="fa-solid fa-arrow-down-to-bracket text-xs"></i>
+                            <span>Download</span>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateSearchDropdown(query = "") {
+            const matches = softwareData.filter(app => 
+                app.name.toLowerCase().includes(query.toLowerCase()) || app.category.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (matches.length === 0) {
+                dropdownResults.innerHTML = `<div class="p-4 text-center text-xs text-gray-400">No software assets located</div>`;
+                return;
+            }
+
+            dropdownResults.innerHTML = matches.map(app => `
+                <div class="p-2.5 px-4 hover:bg-slate-50 flex items-center justify-between transition gap-2">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="${app.color} text-white p-1.5 rounded-md text-xs w-7 h-7 flex items-center justify-center shrink-0">
+                            <i class="fa-solid ${app.icon}"></i>
+                        </div>
+                        <div class="truncate">
+                            <div class="font-semibold text-xs text-gray-900 truncate">${app.name}</div>
+                            <div class="text-[10px] text-gray-400">${app.size} • ${app.category}</div>
+                        </div>
+                    </div>
+                    <a 
+                        href="${app.downloadUrl}" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        class="bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white px-2.5 py-1 rounded-md text-[11px] font-bold transition block text-center"
+                    >
+                        Get
+                    </a>
+                </div>
+            `).join('');
+        }
+
+        function resetFilters() {
+            searchInput.value = "";
+            currentSearch = "";
+            currentCategory = "all";
+            filterButtons.forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-600', 'active');
+                btn.classList.add('text-gray-600');
+                if(btn.dataset.category === 'all') btn.classList.add('bg-blue-50', 'text-blue-600', 'active');
+            });
+            renderMainCatalog();
+        }
+
+        searchInput.addEventListener('focus', () => {
+            updateSearchDropdown(searchInput.value);
+            searchDropdown.classList.remove('hidden');
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            updateSearchDropdown(e.target.value);
+            renderMainCatalog();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('searchContainer').contains(e.target)) {
+                searchDropdown.classList.add('hidden');
+            }
+        });
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-blue-50', 'text-blue-600', 'active');
+                    btn.classList.add('text-gray-600');
+                });
+                button.classList.add('bg-blue-50', 'text-blue-600', 'active');
+                currentCategory = button.dataset.category;
+                renderMainCatalog();
+            });
+        });
+
+        updateCategoryBadges();
+        renderMainCatalog();
+    </script>
+</body>
+</html>
